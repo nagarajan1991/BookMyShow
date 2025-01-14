@@ -1,0 +1,47 @@
+Class 1:
+mkdir BookMyShow
+cd BookMyShow
+npm create vite 
+    > Project Name: Frontend
+    > Package Name: frontend
+    > Framework   : React
+    > Variant     : Javascript
+cd Frontend
+npm i react-router-dom
+updated /Frontend/src/index.css with custom css file
+npm i antd
+Updated App.jsx, remove all default content
+Updated Home.jsx, Login.jsx and Register.jsx
+
+npm i express mongoose nodemon mongodb dotenv 
+create .env file under /Backend
+create .gitignore file under /Frontend
+create server.js
+create folder structure pertaining to MVC -> config, controllers, models, routes
+Add contents to server.js file 
+create db.js /Backend/config/
+Add mongodb creds to .env file 
+Create userSchema.js file for basic modal creation
+create userRoute.js file under route folder 
+
+Post request in postman
+localhost:8000/bms/users/register
+
+{
+    "name": "naga",
+    "email": "test@gmail.com",
+    "password": "12345" 
+}
+
+{
+    "success": true,
+    "message": "Registration Successfull, Please Login"
+}
+
+
+localhost:8000/bms/users/login
+{
+    "name": "naga",
+    "email": "test@gmail.com",
+    "password": "12345" 
+}
