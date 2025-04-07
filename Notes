@@ -45,3 +45,42 @@ localhost:8000/bms/users/login
     "email": "test@gmail.com",
     "password": "12345" 
 }
+
+
+GIT Cmds:
+cd BookMyShow
+git init 
+git add .
+git remote add origin https://<TOKEN>@github.com/nagarajan1991/BookMyShow.git
+git commit -m "Part1 14Jan2025"
+git push -u origin main   
+
+
+Class 2:
+cd backend
+npm i bcrypt
+add hashing logic to register and login part of usercontroller
+Onfinish to manage the states
+Building api call - Lib to build api call axios
+frontend : npm i axios
+create api folder under frontend src folder
+create index.js, user.js
+backend: npm i cors 
+add cors to server.js
+
+cd backend
+npm i jsonwebtoken
+npm audit fix
+
+
+
+Part 3:
+Install redux toolkit: npm i @reduxjs/toolkit
+npm install react-redux
+create redux folder
+>store.js file 
+Add the store to app.jsx
+added protectedroute.jsx 
+when the users logs in , based on access rights it should show different page
+creation of userSlice.js
+npm install @ant-design/icons
