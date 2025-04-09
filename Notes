@@ -84,3 +84,15 @@ added protectedroute.jsx
 when the users logs in , based on access rights it should show different page
 creation of userSlice.js
 npm install @ant-design/icons
+
+
+Part 4:
+Create movieSchemamodel.js
+Create movieController.js
+create movieRoute.js
+updated admin/index.jsx
+created TheatreTable.jsx
+created MovieList.jsx
+created MovieForm.jsx
+created movie.js
+npm install luxon
