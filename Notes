@@ -96,3 +96,14 @@ created MovieList.jsx
 created MovieForm.jsx
 created movie.js
 npm install luxon
+
+
+Part 5:
+Deleting movies based on ID 
+Using moment for date formatting
+Token expiry logic in index.js
+Add user type to regesiter.jsx
+Create theatreSchema.js
+create theatreRoute.js
+create TheatreList.jsx
+create DeleteTheatreModal.jsx
