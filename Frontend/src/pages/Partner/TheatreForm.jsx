@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Col, Modal, Row, Form, Input, Button, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -23,6 +22,7 @@ const TheatreForm = ({
       if (formType === "add") {
         response = await addTheatre({ ...values, owner: user._id });
       } else {
+        values.theatreId = selectedTheatre._id;
         response = await updateTheatre(values);
       }
       if (response.success) {

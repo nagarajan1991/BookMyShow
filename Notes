@@ -107,3 +107,12 @@ Create theatreSchema.js
 create theatreRoute.js
 create TheatreList.jsx
 create DeleteTheatreModal.jsx
+
+
+part6:
+Updated home.jsx
+create showmodal.jsc under partner folder 
+create show object showSchema.js under modals
+create showtoutes.js
+create showController.js
+create api/show.js
