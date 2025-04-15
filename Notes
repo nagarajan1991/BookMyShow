@@ -116,3 +116,12 @@ create show object showSchema.js under modals
 create showtoutes.js
 create showController.js
 create api/show.js
+
+
+part 7:
+add Stripe component 
+bookingSchema.js
+booking controller 
+npm i stripe 
+update server.js
+npm i react-stripe-checkout
