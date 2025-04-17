@@ -125,3 +125,8 @@ booking controller
 npm i stripe 
 update server.js
 npm i react-stripe-checkout
+
+
+part 8:
+email implementation 
+reset password using OTP

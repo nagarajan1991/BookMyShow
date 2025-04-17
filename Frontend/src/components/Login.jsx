@@ -16,6 +16,9 @@ const Login = () => {
         message.success(response?.message);
         localStorage.setItem("tokenForBMS", response?.data);
         navigate("/");
+      } else if (response?.message === "Please enter valid password") {
+        // to do
+        message.error(response?.message);
       }
     } catch (error) {
       message.error(error);
@@ -78,6 +81,9 @@ const Login = () => {
         <section>
           <p>
             New User ? <Link to="/register">Register Here</Link>
+          </p>
+          <p>
+            Forgot Password? <Link to="/forget">Click Here</Link>
           </p>
         </section>
       </main>
