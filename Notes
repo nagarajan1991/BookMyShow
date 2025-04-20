@@ -130,3 +130,7 @@ npm i react-stripe-checkout
 part 8:
 email implementation 
 reset password using OTP
+
+
+part 9: install rate limiter
+helper for XSS 

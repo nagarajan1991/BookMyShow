@@ -1,0 +1,811 @@
+/* Base styles and variables */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --primary-color: #cc0c2f;
+  --primary-dark: #d81f3d;
+  --secondary-color: #2b3148;
+  --text-color: #333333;
+  --text-light: #666666;
+  --background-color: #f5f5f5;
+  --border-color: #e5e5e5;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
+  --header-height: 64px;
+}
+
+/* Global Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Layout Components */
+.content-container {
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  padding: 24px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
+}
+
+/* Header/Navbar Styles */
+.header {
+  background: var(--primary-color) !important;
+  padding: 0 !important;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 64px !important;
+  line-height: normal !important;
+}
+
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+/* Logo and Creator Link Styles */
+.logo {
+  cursor: pointer;
+  margin-right: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.logo h3 {
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1;
+  padding-top: 12px; /* Add padding from top */
+}
+
+.creator-link {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  margin-top: 0px;  /* Reduced from previous value */
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding-bottom: 12px; /* Add padding from bottom */
+}
+
+.creator-link:hover {
+  color: white;
+}
+
+
+.creator-link .anticon {
+  font-size: 12px;
+}
+
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .logo {
+    margin-right: 24px;
+  }
+
+  .logo h3 {
+    font-size: 20px;
+    padding-top: 8px;
+  }
+
+  .creator-link {
+    font-size: 10px;
+    padding-bottom: 8px;
+  }
+
+  .creator-link .anticon {
+    font-size: 10px;
+  }
+}
+
+.menu-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: auto;
+  height: 100%;
+}
+
+/* Menu Styles */
+.main-menu,
+.user-menu {
+  background: transparent !important;
+  border-bottom: none !important;
+  height: 100%;
+}
+
+.main-menu {
+  flex: 1;
+}
+
+.user-menu {
+  margin-left: auto;
+}
+
+.ant-menu.ant-menu-dark {
+  background: transparent !important;
+}
+
+.ant-menu-horizontal {
+  line-height: var(--header-height) !important;
+  border-bottom: none !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
+  height: var(--header-height) !important;
+  line-height: var(--header-height) !important;
+  padding: 0 20px !important;
+  margin: 0 4px !important;
+  display: flex;
+  align-items: center;
+  transition: none !important; /* Prevent transition effects that might cause glitches */
+}
+
+
+/* Fix for the ellipsis issue */
+.ant-menu-horizontal > .ant-menu-item .anticon,
+.ant-menu-horizontal > .ant-menu-item .ant-menu-title-content,
+.ant-menu-horizontal > .ant-menu-submenu .anticon,
+.ant-menu-horizontal > .ant-menu-submenu .ant-menu-title-content {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important;
+}
+
+
+.ant-menu-horizontal > .ant-menu-item:hover,
+.ant-menu-horizontal > .ant-menu-submenu:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Ensure menu items maintain their state */
+.ant-menu-item-selected,
+.ant-menu-item-active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Force menu items to show content */
+.ant-menu-overflow-item {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Prevent ellipsis from showing */
+.ant-menu-overflow-item-rest {
+  display: none !important;
+}
+
+/* User Menu Styles */
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  height: var(--header-height);
+}
+
+.user-icon {
+  font-size: 18px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-name {
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.user-type {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+/* Dropdown Menu Styles */
+.ant-dropdown-menu {
+  padding: 4px !important;
+}
+
+.ant-dropdown-menu-item {
+  padding: 8px 12px !important;
+  border-radius: 4px;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+.ant-dropdown-menu-item .anticon {
+  margin-right: 8px;
+}
+
+/* Button Styles */
+.ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  transition: var(--transition);
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* Card and Movie Styles */
+.movie-card {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+  position: relative;
+}
+
+
+.movie-card:hover {
+  transform: scale(1.02);
+}
+
+/* Movie content styles */
+.movie-content {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 90px; /* Add minimum height to ensure consistent spacing */
+}
+
+/* Form Styles */
+.show-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.show-form .ant-form-item-label > label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.show-form .ant-input,
+.show-form .ant-select-selector {
+  height: 40px !important;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+/* Modal Styles */
+.show-modal .ant-modal-content {
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.show-modal .ant-modal-header {
+  margin-bottom: 24px;
+}
+
+/* Table Styles */
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+/* Loader Styles */
+.loader-container {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--background-color);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Search Styles */
+.search-container {
+  padding: 24px 0;
+  margin-bottom: 24px;
+}
+
+.search-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.search-input {
+  width: 100%;
+  border-radius: 4px;
+}
+
+/* Interactive Elements */
+.clickable-link {
+  color: white !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.clickable-link:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Seat Selection Styles */
+.seat-ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 900px;
+}
+
+.seat-btn {
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: white;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.seat-btn.selected {
+  background: #1890ff;
+  color: white;
+  border-color: #1890ff;
+}
+
+.seat-btn.booked {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  color: var(--text-light);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 16px;
+  }
+
+  .logo {
+    margin-right: 24px;
+  }
+
+  .logo h3 {
+    font-size: 20px;
+  }
+
+  .ant-menu-horizontal > .ant-menu-item,
+  .ant-menu-horizontal > .ant-menu-submenu {
+    padding: 0 12px !important;
+  }
+
+  .content-container {
+    padding: 16px;
+    width: 100%;
+  }
+
+  .seat-ul {
+    grid-template-columns: repeat(6, 1fr);
+    margin-left: 0 !important;
+  }
+
+
+  .search-wrapper {
+    padding: 0 16px;
+  }
+
+  .user-menu-item {
+    padding: 0 4px;
+  }
+
+  .user-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .user-name {
+    font-size: 13px;
+  }
+
+  .user-type {
+    font-size: 11px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .header,
+  .search-container {
+    display: none !important;
+  }
+
+  .content-container {
+    margin-top: 0;
+    padding: 0;
+  }
+}
+
+
+/* styles/login.css */
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-links {
+  margin-top: 20px;
+}
+
+.auth-links p {
+  margin: 10px 0;
+}
+
+.auth-links a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+
+.movie-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.movie-hero {
+  margin-bottom: 2rem;
+}
+
+.movie-details-card {
+  background: transparent !important;
+  border: none !important;
+}
+
+.movie-poster {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.movie-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.date-picker-section {
+  margin-top: 2rem;
+}
+
+.date-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.date-input {
+  max-width: 200px;
+  border-radius: 6px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+}
+
+.theatre-card {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theatre-info {
+  padding: 0.5rem 0;
+}
+
+.theatre-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.theatre-address {
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.show-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0.5rem 0;
+}
+
+.show-time-btn {
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #df1827; /* Your website's red color */
+  border: 1px solid #df1827;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.show-time-btn:hover {
+  background: #df1827;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(223, 24, 39, 0.2); /* Subtle shadow with red tint */
+}
+
+.show-time-btn:active {
+  transform: translateY(0);
+  background: #c41522; /* Darker red for active state */
+  color: white;
+}
+
+/* Optional: Add a selected state if needed */
+.show-time-btn.selected {
+  background: #df1827;
+  color: white;
+}
+
+.empty-theatres {
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+}
+
+
+.movie-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #1a1a1a;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 44px;
+  transition: color 0.3s ease; /* Add smooth transition */
+  cursor: pointer; /* Add pointer cursor to indicate clickable */
+}
+
+.movie-title:hover {
+  color: var(--primary-color); /* Using your existing red color variable */
+}
+
+/* Movie info tags */
+.movie-info {
+  display: flex;
+  flex-direction: column; /* Change to column layout */
+  gap: 8px;
+  margin-top: auto; /* Push tags to bottom of card */
+}
+
+.movie-tag {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  color: #666;
+  display: inline-block; /* Ensure proper tag display */
+  margin-right: 8px; /* Add space between tags */
+}
+
+/* Movie image container */
+.movie-image-container {
+  position: relative;
+  padding-top: 150%; /* 2:3 aspect ratio */
+  overflow: hidden;
+}
+
+.movie-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .movie-content {
+    min-height: 80px;
+  }
+
+  .movie-tag {
+    font-size: 11px;
+  }
+}
+
+/* For single movie page */
+.movie-hero .movie-title {
+  color: white !important;
+  font-size: 2.5rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.2 !important;
+}
+
+.movie-hero .movie-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+
+.movie-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+
+
+/* Theatre List Styles */
+.theatre-list-container {
+  padding: 20px;
+}
+
+.theatre-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.theatre-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.add-theatre-btn {
+  height: 40px;
+  padding: 0 24px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.action-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.status-badge.active {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-badge.inactive {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+
+.theatre-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .theatre-list-container {
+    padding: 16px;
+  }
+
+  .theatre-header h2 {
+    font-size: 20px;
+  }
+
+  .action-buttons {
+    gap: 8px;
+  }
+
+  .add-theatre-btn {
+    height: 36px;
+    padding: 0 16px;
+  }
+}
