@@ -5,43 +5,43 @@ import { LoginUser } from "../../api/users";
 import { useDispatch } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/loaderSlice";
 import { SetUser } from "../../redux/userSlice";
+import { UserOutlined, LockOutlined, LinkedinOutlined } from "@ant-design/icons";
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-// pages/Login/index.jsx
-const onFinish = async (values) => {
-  try {
-    const response = await LoginUser(values);
-    if (response.success) {
-      message.success(response.message);
-      
-      // Store both token and user data
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      
-      // Redirect based on user role
-      switch (response.data.user.role) {
-        case "admin":
-          navigate("/admin");
-          break;
-        case "partner":
-          navigate("/partner");
-          break;
-        default:
-          navigate("/");
+  // Keeping your existing onFinish function exactly as is
+  const onFinish = async (values) => {
+    try {
+      const response = await LoginUser(values);
+      if (response.success) {
+        message.success(response.message);
+        
+        // Store both token and user data
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        
+        // Redirect based on user role
+        switch (response.data.user.role) {
+          case "admin":
+            navigate("/admin");
+            break;
+          case "partner":
+            navigate("/partner");
+            break;
+          default:
+            navigate("/");
+        }
+      } else {
+        message.error(response.message);
       }
-    } else {
-      message.error(response.message);
+    } catch (err) {
+      message.error(err.message);
     }
-  } catch (err) {
-    message.error(err.message);
-  }
-};
+  };
 
-
-  // Redirect if already logged in
+  // Keeping your existing useEffect exactly as is
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -61,86 +61,85 @@ const onFinish = async (values) => {
   }, [navigate]);
 
   return (
-    <>
-      <main className="App-header">
-        <h1>BookMyShow</h1>
-        <section className="mw-500 text-center px-3">
+    <div className="login-container">
+      <div className="login-background"></div>
+      <div className="login-content">
+        <div className="login-box">
+          <div className="login-header">
+            <h1 className="brand-title">BookMyShow</h1>
+            <p className="brand-tagline">Your Gateway to Entertainment</p>
+          </div>
+
           <Form 
             layout="vertical" 
             onFinish={onFinish}
             className="login-form"
           >
             <Form.Item
-              label="Email"
               name="email"
-              className="d-block"
               rules={[
-                { 
-                  required: true, 
-                  message: "Email is required" 
-                },
-                { 
-                  type: "email", 
-                  message: "Please enter a valid email id." 
-                }
+                { required: true, message: "Email is required" },
+                { type: "email", message: "Please enter a valid email id." }
               ]}
             >
               <Input
-                id="email"
-                type="email"
+                prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder="Enter your Email"
+                className="custom-input"
                 autoComplete="email"
               />
             </Form.Item>
 
             <Form.Item
-              label="Password"
               name="password"
-              className="d-block"
               rules={[
-                { 
-                  required: true, 
-                  message: "Password is required" 
-                },
-                {
-                  min: 5,
-                  message: "Password must be at least 5 characters"
-                }
+                { required: true, message: "Password is required" },
+                { min: 5, message: "Password must be at least 5 characters" }
               ]}
             >
               <Input.Password
-                id="password"
+                prefix={<LockOutlined className="site-form-item-icon" />}
                 placeholder="Enter your Password"
+                className="custom-input"
                 autoComplete="current-password"
               />
             </Form.Item>
 
-            <Form.Item className="d-block">
+            <Form.Item>
               <Button
                 type="primary"
-                block
                 htmlType="submit"
-                style={{ 
-                  fontSize: "1rem", 
-                  fontWeight: "600" 
-                }}
+                block
+                className="login-button"
               >
                 Login
               </Button>
             </Form.Item>
+
+            <div className="form-links">
+              <Link to="/register" className="register-link">
+                New User? Register Here
+              </Link>
+              <Link to="/forgot-password" className="forgot-password-link">
+                Forgot Password?
+              </Link>
+            </div>
           </Form>
 
-          <div className="auth-links">
-            <p>
-              New User? <Link to="/register">Register Here</Link>
-            </p>
-            <p>
-              Forgot Password? <Link to="/forgot-password">Reset Here</Link>
-            </p>
+          <div className="creator-info">
+            <p>Created by Naga Lakshmanan</p>
+            <a
+              href="https://www.linkedin.com/in/nagalakshmanan/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="linkedin-link"
+            >
+              <LinkedinOutlined /> Connect on LinkedIn
+            </a>
           </div>
-        </section>
-      </main>
-    </>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -167,7 +167,7 @@ const isPathAllowed = (userRole, path) => {
         <Header className="header">
   <div className="header-content">
     <div className="logo">
-      <h3>BookMyShow</h3>
+    <h3 onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>BookMyShow</h3>
       <a 
         href="https://www.linkedin.com/in/nagalakshmanan/" 
         target="_blank" 
@@ -177,52 +177,58 @@ const isPathAllowed = (userRole, path) => {
         by Naga Lakshmanan <LinkedinOutlined />
       </a>
     </div>
-    <div className="menu-container">
-      <Menu
-        theme="dark"
-        mode="horizontal"
-        selectedKeys={[location.pathname]}
-        className="main-menu"
-        items={navItems.filter(item => item.key !== 'user')}
-      />
-            <Menu
-              theme="dark"
-              mode="horizontal"
-              className="user-menu"
-            >
-              <Menu.SubMenu
-                key="user"
-                title={
-                  <div className="user-menu-item">
-                    <UserOutlined className="user-icon" />
-                    <div className="user-info">
-                      <span className="user-name">{user?.name || 'User'}</span>
-                      <span className="user-type">{user?.role || ''}</span>
-                    </div>
-                  </div>
-                }
-              >
-                <Menu.Item 
-                  key="profile" 
-                  icon={<ProfileOutlined />}
-                  onClick={() => {
-                    if (user?.role === 'admin') navigate("/admin");
-                    else if (user?.role === 'partner') navigate("/partner");
-                    else navigate("/profile");
-                  }}
-                >
-                  My Profile
-                </Menu.Item>
-                <Menu.Item 
-                  key="logout" 
-                  icon={<LogoutOutlined />} 
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Menu.Item>
-              </Menu.SubMenu>
-            </Menu>
+
+<div className="menu-container">
+  {/* Main Menu */}
+  <Menu
+    theme="dark"
+    mode="horizontal"
+    selectedKeys={[location.pathname === '/profile' ? '' : location.pathname]}
+    className="main-menu"
+    items={navItems.filter(item => item.key !== 'user')}
+  />
+
+  {/* User Menu */}
+  <Menu
+    theme="dark"
+    mode="horizontal"
+    selectedKeys={[location.pathname === '/profile' ? 'profile' : '']}
+    className="user-menu"
+  >
+    <Menu.SubMenu
+      key="user"
+      title={
+        <div className="user-menu-item">
+          <UserOutlined className="user-icon" />
+          <div className="user-info">
+            <span className="user-name">{user?.name || 'User'}</span>
+            <span className="user-type">{user?.role || ''}</span>
           </div>
+        </div>
+      }
+    >
+      <Menu.Item 
+        key="profile" 
+        icon={<ProfileOutlined />}
+        onClick={() => {
+          if (user?.role === 'admin') navigate("/admin");
+          else if (user?.role === 'partner') navigate("/partner");
+          else navigate("/profile");
+        }}
+      >
+        My Profile
+      </Menu.Item>
+      <Menu.Item 
+        key="logout" 
+        icon={<LogoutOutlined />} 
+        onClick={handleLogout}
+      >
+        Logout
+      </Menu.Item>
+    </Menu.SubMenu>
+  </Menu>
+</div>
+
         </div>
       </Header>
       <div className="content-container">

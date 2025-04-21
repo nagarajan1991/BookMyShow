@@ -287,20 +287,56 @@ body {
 
 /* Card and Movie Styles */
 .movie-card {
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s;
+  transition: transform 0.3s ease;
+}
+
+.movie-card .movie-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #1a1a1a;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 44px;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.movie-card .movie-title:hover {
+  color: var(--primary-color);
+}
+
+
+.movie-poster-container {
   position: relative;
+  padding-top: 150%; /* 2:3 aspect ratio */
+  overflow: hidden;
+}
+
+
+.movie-poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 
 .movie-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
+
 
 /* Movie content styles */
 .movie-content {
@@ -662,12 +698,32 @@ body {
   color: var(--primary-color); /* Using your existing red color variable */
 }
 
+.movie-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.movie-genre,
+.movie-language {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.2;
+}
+
+
 /* Movie info tags */
 .movie-info {
   display: flex;
-  flex-direction: column; /* Change to column layout */
-  gap: 8px;
-  margin-top: auto; /* Push tags to bottom of card */
+  flex-direction: column;
+  height: 100%;
+  min-height: 90px; /* Set minimum height for content */
+}
+
+.movie-title-container {
+  flex: 1;
+  margin-bottom: 8px;
 }
 
 .movie-tag {
@@ -714,6 +770,9 @@ body {
   font-weight: 600 !important;
   margin-bottom: 1rem !important;
   line-height: 1.2 !important;
+  min-height: auto !important; /* Override the grid view height */
+  -webkit-line-clamp: none !important; /* Remove line clamping */
+  display: block !important; /* Override grid view display */
 }
 
 .movie-hero .movie-tags {
@@ -809,3 +868,386 @@ body {
     padding: 0 16px;
   }
 }
+
+
+.payment-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-element-container {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.payment-error {
+  color: #dc3545;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.StripeElement {
+  height: 40px;
+  padding: 10px 12px;
+  width: 100%;
+  color: #32325d;
+  background-color: white;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+
+/* TicketView.css */
+.ticket-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  .ticket-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+  
+  .boarding-pass {
+    padding: 2rem;
+  }
+  
+  /* Poster Section */
+  .poster-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .movie-poster-container {
+    aspect-ratio: 2/3;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+  }
+  
+  .movie-poster-container:hover {
+    transform: scale(1.02);
+  }
+  
+  .movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+
+
+.profile-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.detail-item {
+  margin-bottom: 20px;
+}
+
+.detail-item label {
+  display: block;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.detail-item p {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+      margin: 10px;
+  }
+}
+
+/* Ensure consistent highlighting for all menu items */
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-item-selected,
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu-selected {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Hover effect */
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover,
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Active/Selected state */
+.ant-menu-item-selected,
+.ant-menu-item-active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Force menu items to show content */
+.ant-menu-overflow-item {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Prevent ellipsis from showing */
+.ant-menu-overflow-item-rest {
+    display: none !important;
+}
+
+/* Menu item styles */
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
+    height: var(--header-height) !important;
+    line-height: var(--header-height) !important;
+    padding: 0 20px !important;
+    margin: 0 4px !important;
+    display: flex;
+    align-items: center;
+    transition: none !important;
+}
+
+/* Add to your CSS file */
+.menu-container {
+  display: flex;
+  align-items: center;
+}
+
+.main-menu {
+  flex: 1;
+}
+
+.user-menu {
+  min-width: auto;
+}
+
+/* Reset all menu item backgrounds */
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-dark.ant-menu-horizontal > .ant-menu-submenu {
+  background-color: transparent !important;
+}
+
+/* Style for selected main menu items */
+.main-menu.ant-menu-dark.ant-menu-horizontal > .ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Style for selected user menu items */
+.user-menu.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Submenu styles */
+.ant-menu-dark .ant-menu-sub {
+  background-color: #001529 !important;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* User menu item styles */
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+.user-type {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Login Page Styles */
+.login-container {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+}
+
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  filter: blur(8px);
+}
+
+.login-content {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  z-index: 1;
+}
+
+.login-box {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.brand-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #cc0c2f;
+  margin: 0;
+}
+
+.brand-tagline {
+  color: #666;
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+.custom-input {
+  height: 45px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+}
+
+.custom-input:hover,
+.custom-input:focus {
+  border-color: #cc0c2f;
+  box-shadow: 0 0 0 2px rgba(204, 12, 47, 0.1);
+}
+
+.login-button {
+  height: 45px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  background: #cc0c2f !important;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(204, 12, 47, 0.3);
+}
+
+.form-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.register-link,
+.forgot-password-link {
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.register-link:hover,
+.forgot-password-link:hover {
+  color: #cc0c2f;
+}
+
+.creator-info {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.creator-info p {
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.linkedin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0077b5;
+  transition: all 0.3s ease;
+}
+
+.linkedin-link:hover {
+  color: #005582;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .login-box {
+    padding: 30px 20px;
+  }
+
+  .brand-title {
+    font-size: 28px;
+  }
+
+  .brand-tagline {
+    font-size: 14px;
+  }
+
+  .login-content {
+    padding: 15px;
+  }
+}
+
+
+

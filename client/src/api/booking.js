@@ -1,26 +1,36 @@
 import { axiosInstance } from ".";
 
-export const makePayment = async (token, amount) => {
+// Create axios instance with default config
+const api = axiosInstance.create({
+  baseURL: '/api/bookings'
+});
+
+
+// Add request interceptor to add token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+
+export const makePayment = async (data) => {
   try {
-    const response = await axiosInstance.post("/api/bookings/make-payment", {
-      token,
-      amount,
-    });
-    return response.data;
-  } catch (err) {
-    console.log("Error while making payment", err);
+      const response = await api.post("/make-payment", data);
+      return response.data;
+  } catch (error) {
+      throw error.response?.data || error;
   }
 };
 
-export const bookShow = async (payload) => {
+export const bookShow = async (data) => {
   try {
-    const response = await axiosInstance.post(
-      "/api/bookings/book-show",
-      payload
-    );
-    return response.data;
-  } catch (err) {
-    console.log("Error while booking show", err);
+      const response = await api.post("/book-show", data);
+      return response.data;
+  } catch (error) {
+      throw error.response?.data || error;
   }
 };
 

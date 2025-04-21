@@ -27,6 +27,7 @@ import {
 import moment from "moment";
 
 const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [view, setView] = useState("table");
   const [shows, setShows] = useState([]);
@@ -38,6 +39,7 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
     setIsShowModalOpen(false);
     setSelectedShow(null);
     setView("table");
+    form.resetFields();
   };
 
   const getData = async () => {
@@ -58,27 +60,35 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
       } else {
         message.error(showsResponse.message);
       }
-      dispatch(HideLoading());
     } catch (error) {
       message.error(error.message);
+    } finally {
       dispatch(HideLoading());
     }
   };
 
   const onFinish = async (values) => {
     try {
+      await form.validateFields();
       dispatch(ShowLoading());
+
+      // Format the data
+      const showData = {
+        ...values,
+        theatre: selectedTheatre._id,
+        date: moment(values.date).format('YYYY-MM-DD'),
+        ticketPrice: Number(values.ticketPrice),
+        totalSeats: Number(values.totalSeats),
+        availableSeats: Number(values.totalSeats)
+      };
+
       let response = null;
 
       if (view === "form") {
-        response = await addShow({
-          ...values,
-          theatre: selectedTheatre._id,
-        });
+        response = await addShow(showData);
       } else {
         response = await updateShow({
-          ...values,
-          theatre: selectedTheatre._id,
+          ...showData,
           showId: selectedShow._id,
         });
       }
@@ -87,12 +97,13 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
         message.success(response.message);
         getData();
         setView("table");
+        form.resetFields();
       } else {
         message.error(response.message);
       }
-      dispatch(HideLoading());
     } catch (error) {
       message.error(error.message);
+    } finally {
       dispatch(HideLoading());
     }
   };
@@ -107,9 +118,9 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
       } else {
         message.error(response.message);
       }
-      dispatch(HideLoading());
     } catch (error) {
       message.error(error.message);
+    } finally {
       dispatch(HideLoading());
     }
   };
@@ -159,6 +170,20 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
     },
   ];
 
+  // Form management useEffect
+  useEffect(() => {
+    if (view === 'form') {
+      form.resetFields();
+    } else if (view === 'edit' && selectedShow) {
+      form.setFieldsValue({
+        ...selectedShow,
+        date: moment(selectedShow.date).format('YYYY-MM-DD'),
+        movie: selectedShow.movie._id
+      });
+    }
+  }, [view, selectedShow, form]);
+
+  // Initial data loading
   useEffect(() => {
     getData();
   }, []);
@@ -192,20 +217,36 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
 
       {(view === "form" || view === "edit") && (
         <Form
+          form={form}
           layout="vertical"
           className="show-form"
-          initialValues={view === "edit" ? selectedShow : null}
           onFinish={onFinish}
         >
           <Row gutter={[24, 16]}>
-
             <Col xs={24} sm={12} md={8}>
               <Form.Item
                 label="Show Date"
                 name="date"
-                rules={[{ required: true, message: "Show date is required!" }]}
+                rules={[
+                  { required: true, message: "Show date is required!" },
+                  {
+                    validator: (_, value) => {
+                      if (value && moment(value).isBefore(moment().startOf('day'))) {
+                        return Promise.reject('Cannot select past dates');
+                      }
+                      if (value && moment(value).isAfter(moment().add(3, 'months'))) {
+                        return Promise.reject('Cannot select dates more than 3 months in advance');
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
               >
-                <Input type="date" />
+                <Input 
+                  type="date" 
+                  min={moment().format('YYYY-MM-DD')}
+                  max={moment().add(3, 'months').format('YYYY-MM-DD')}
+                />
               </Form.Item>
             </Col>
 
@@ -213,7 +254,23 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
               <Form.Item
                 label="Show Time"
                 name="time"
-                rules={[{ required: true, message: "Show time is required!" }]}
+                dependencies={['date']}
+                rules={[
+                  { required: true, message: "Show time is required!" },
+                  {
+                    validator: (_, value) => {
+                      const date = form.getFieldValue('date');
+                      if (date && value && moment(date).isSame(moment(), 'day')) {
+                        const selectedTime = moment(value, 'HH:mm');
+                        const currentTime = moment();
+                        if (selectedTime.isBefore(currentTime)) {
+                          return Promise.reject('Cannot select past time for today');
+                        }
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
               >
                 <Input type="time" />
               </Form.Item>
@@ -227,11 +284,14 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
               >
                 <Select
                   placeholder="Select Movie"
-                  defaultValue={selectedMovie && selectedMovie.title}
                   options={movies?.map((movie) => ({
                     value: movie._id,
                     label: movie.title,
                   }))}
+                  onChange={(value) => {
+                    const movie = movies.find(m => m._id === value);
+                    setSelectedMovie(movie);
+                  }}
                 />
               </Form.Item>
             </Col>
@@ -240,28 +300,72 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
               <Form.Item
                 label="Ticket Price"
                 name="ticketPrice"
-                rules={[{ required: true, message: "Ticket price is required!" }]}
+                rules={[
+                  { required: true, message: "Ticket price is required!" },
+                  { type: 'number', min: 1, message: "Price must be greater than 0" },
+                  { type: 'number', max: 10000, message: "Price cannot exceed 10000" }
+                ]}
               >
-                <Input type="number" placeholder="Enter ticket price" />
+                <Input 
+                  type="number"
+                  min="1"
+                  max="10000"
+                  onChange={(e) => form.setFieldsValue({ 
+                    ticketPrice: Number(e.target.value) 
+                  })}
+                  placeholder="Enter ticket price"
+                />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={8}>
-              <Form.Item
-                label="Total Seats"
-                name="totalSeats"
-                rules={[{ required: true, message: "Total seats are required!" }]}
-              >
-                <Input
-                  type="number"
-                  placeholder="Enter the number of total seats"
-                />
-              </Form.Item>
-            </Col>
+  <Form.Item
+    label="Total Seats"
+    name="totalSeats"
+    rules={[
+      { required: true, message: "Total seats are required!" },
+      { 
+        validator: async (_, value) => {
+          const seats = Number(value);
+          if (isNaN(seats)) {
+            throw new Error('Please enter a valid number');
+          }
+          if (seats < 1) {
+            throw new Error('Seats must be greater than 0');
+          }
+          if (seats > 500) {
+            throw new Error('Seats cannot exceed 500');
+          }
+          return Promise.resolve();
+        }
+      }
+    ]}
+  >
+    <Input
+      type="number"
+      min="1"
+      max="500"
+      onChange={(e) => {
+        const value = Number(e.target.value);
+        form.setFieldsValue({ 
+          totalSeats: value 
+        });
+      }}
+      placeholder="Enter the number of total seats"
+    />
+  </Form.Item>
+</Col>
+
           </Row>
 
           <div className="form-actions">
-            <Button onClick={() => setView("table")} className="back-button me-3">
+            <Button 
+              onClick={() => {
+                setView("table");
+                form.resetFields();
+              }} 
+              className="back-button me-3"
+            >
               <ArrowLeftOutlined /> Go Back
             </Button>
             <Button type="primary" htmlType="submit">

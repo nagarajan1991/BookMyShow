@@ -111,11 +111,13 @@ const SingleMovie = () => {
                 <Card className="movie-details-card bg-transparent">
                   <Row gutter={24} align="middle">
                     <Col xs={24} sm={8} md={6}>
+                    <div className="movie-poster-container">
                       <img 
                         src={movie.poster} 
                         alt={movie.title}
                         className="movie-poster"
                       />
+                      </div>
                     </Col>
                     <Col xs={24} sm={16} md={18}>
                       <div className="movie-info">

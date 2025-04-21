@@ -10,6 +10,7 @@ import SingleMovie from "./pages/Home/SingleMovie";
 import BookShow from './pages/Home/BookShow';
 import Forget from "./pages/Profile/ForgetPassword";
 import Reset from "./pages/Profile/ResetPassword";
+import TicketView from './pages/Home/TicketView';
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from './components/ProtectedRoute';
@@ -123,6 +124,17 @@ function App() {
                   </RoleBasedRoute>
                 </ProtectedRoute>
               }
+            />
+
+            <Route 
+              path="/ticket-view" 
+              element={
+                <ProtectedRoute>
+                   <RoleBasedRoute allowedRoles={["user", "admin", "partner"]}>
+                  <TicketView />
+                  </RoleBasedRoute>
+                </ProtectedRoute>
+              } 
             />
 
             {/* Catch all other routes */}

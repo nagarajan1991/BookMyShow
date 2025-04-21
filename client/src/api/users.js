@@ -125,3 +125,13 @@ export const getUserRole = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     return user?.role || 'user';
 }
+
+
+export const UpdateUserProfile = async (payload) => {
+    try {
+        const response = await axiosInstance.post('/api/users/update-profile', payload);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+};

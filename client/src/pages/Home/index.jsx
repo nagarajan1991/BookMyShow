@@ -61,6 +61,8 @@ function Home() {
             movie?.title?.toLowerCase().includes(searchText.toLowerCase())
           ).map(movie => (
 // In your Home/index.jsx file, update the Card section within the Row mapping:
+// Keep your existing Home component code, but update the Card section:
+
 <Col xs={12} sm={8} md={6} lg={4} key={movie._id}>
   <Card 
     hoverable
@@ -78,14 +80,19 @@ function Home() {
     bodyStyle={{ padding: '12px 16px' }}
   >
     <div className="movie-info">
-      <h3 className="movie-title" onClick={() => navigate(`/movie/${movie._id}`)}>{movie.title}</h3>
+      <div className="movie-title-container">
+        <h3 className="movie-title" onClick={() => navigate(`/movie/${movie._id}`)}>
+          {movie.title}
+        </h3>
+      </div>
       <div className="movie-meta">
-        <div>{movie.genre}</div>
-        <div>{movie.language}</div>
+        <span className="movie-genre">{movie.genre}</span>
+        <span className="movie-language">{movie.language}</span>
       </div>
     </div>
   </Card>
 </Col>
+
 
           ))}
         </Row>
