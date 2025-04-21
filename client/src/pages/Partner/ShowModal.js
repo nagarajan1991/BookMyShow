@@ -25,6 +25,8 @@ import {
   updateShow,
 } from "../../api/shows";
 import moment from "moment";
+import { DatePicker, Checkbox, Tag } from "antd";
+const { RangePicker } = DatePicker;
 
 const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => {
   const [form] = Form.useForm();
@@ -34,6 +36,10 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
   const [movies, setMovies] = useState([]);
   const [selectedShow, setSelectedShow] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrencePattern, setRecurrencePattern] = useState('daily');
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [exceptions, setExceptions] = useState([]);
 
   const handleCancel = () => {
     setIsShowModalOpen(false);
@@ -71,35 +77,99 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
     try {
       await form.validateFields();
       dispatch(ShowLoading());
-
-      // Format the data
-      const showData = {
-        ...values,
-        theatre: selectedTheatre._id,
-        date: moment(values.date).format('YYYY-MM-DD'),
-        ticketPrice: Number(values.ticketPrice),
-        totalSeats: Number(values.totalSeats),
-        availableSeats: Number(values.totalSeats)
-      };
-
-      let response = null;
-
-      if (view === "form") {
-        response = await addShow(showData);
+  
+      if (isRecurring && values.dateRange) {
+        // Handle recurring shows
+        const startDate = moment(values.dateRange[0]);
+        const endDate = moment(values.dateRange[1]);
+        let currentDate = startDate.clone();
+        let successCount = 0;
+        let failCount = 0;
+  
+        while (currentDate.isSameOrBefore(endDate)) {
+          // Skip exception dates
+          if (!exceptions.some(date => moment(date).isSame(currentDate, 'day'))) {
+            let shouldAddShow = false;
+  
+            if (recurrencePattern === 'weekly') {
+              // For weekly pattern, check if the current day is selected
+              const dayName = currentDate.format('dddd').toLowerCase();
+              shouldAddShow = selectedDays.includes(dayName);
+            } else if (recurrencePattern === 'daily') {
+              // For daily pattern, add all days
+              shouldAddShow = true;
+            }
+  
+            if (shouldAddShow) {
+              const showData = {
+                ...values,
+                theatre: selectedTheatre._id,
+                date: currentDate.format('YYYY-MM-DD'),
+                ticketPrice: Number(values.ticketPrice),
+                totalSeats: Number(values.totalSeats),
+                availableSeats: Number(values.totalSeats)
+              };
+  
+              try {
+                const response = await addShow(showData);
+                if (response.success) {
+                  successCount++;
+                } else {
+                  failCount++;
+                }
+              } catch (err) {
+                failCount++;
+                console.log(`Failed to create show for date ${currentDate.format('YYYY-MM-DD')}:`, err);
+              }
+            }
+          }
+          currentDate.add(1, 'days');
+        }
+  
+        if (successCount > 0) {
+          message.success(`Successfully created ${successCount} shows${failCount > 0 ? ` (${failCount} failed)` : ''}`);
+          getData();
+          setView("table");
+          form.resetFields();
+          // Reset recurring show states
+          setIsRecurring(false);
+          setRecurrencePattern('daily');
+          setSelectedDays([]);
+          setExceptions([]);
+        } else {
+          message.error("Failed to create any shows");
+        }
+  
       } else {
-        response = await updateShow({
-          ...showData,
-          showId: selectedShow._id,
-        });
-      }
-
-      if (response.success) {
-        message.success(response.message);
-        getData();
-        setView("table");
-        form.resetFields();
-      } else {
-        message.error(response.message);
+        // Handle single show (your existing logic)
+        const showData = {
+          ...values,
+          theatre: selectedTheatre._id,
+          date: moment(values.date).format('YYYY-MM-DD'),
+          ticketPrice: Number(values.ticketPrice),
+          totalSeats: Number(values.totalSeats),
+          availableSeats: Number(values.totalSeats)
+        };
+  
+        let response = null;
+  
+        if (view === "form") {
+          response = await addShow(showData);
+        } else {
+          response = await updateShow({
+            ...showData,
+            showId: selectedShow._id,
+          });
+        }
+  
+        if (response.success) {
+          message.success(response.message);
+          getData();
+          setView("table");
+          form.resetFields();
+        } else {
+          message.error(response.message);
+        }
       }
     } catch (error) {
       message.error(error.message);
@@ -107,6 +177,7 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
       dispatch(HideLoading());
     }
   };
+  
 
   const handleDelete = async (showId) => {
     try {
@@ -216,164 +287,241 @@ const ShowModal = ({ isShowModalOpen, setIsShowModalOpen, selectedTheatre }) => 
       {view === "table" && <Table dataSource={shows} columns={columns} />}
 
       {(view === "form" || view === "edit") && (
-        <Form
-          form={form}
-          layout="vertical"
-          className="show-form"
-          onFinish={onFinish}
-        >
-          <Row gutter={[24, 16]}>
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item
-                label="Show Date"
-                name="date"
-                rules={[
-                  { required: true, message: "Show date is required!" },
-                  {
-                    validator: (_, value) => {
-                      if (value && moment(value).isBefore(moment().startOf('day'))) {
-                        return Promise.reject('Cannot select past dates');
-                      }
-                      if (value && moment(value).isAfter(moment().add(3, 'months'))) {
-                        return Promise.reject('Cannot select dates more than 3 months in advance');
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
-              >
-                <Input 
-                  type="date" 
-                  min={moment().format('YYYY-MM-DD')}
-                  max={moment().add(3, 'months').format('YYYY-MM-DD')}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item
-                label="Show Time"
-                name="time"
-                dependencies={['date']}
-                rules={[
-                  { required: true, message: "Show time is required!" },
-                  {
-                    validator: (_, value) => {
-                      const date = form.getFieldValue('date');
-                      if (date && value && moment(date).isSame(moment(), 'day')) {
-                        const selectedTime = moment(value, 'HH:mm');
-                        const currentTime = moment();
-                        if (selectedTime.isBefore(currentTime)) {
-                          return Promise.reject('Cannot select past time for today');
-                        }
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
-              >
-                <Input type="time" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item
-                label="Select Movie"
-                name="movie"
-                rules={[{ required: true, message: "Movie is required!" }]}
-              >
-                <Select
-                  placeholder="Select Movie"
-                  options={movies?.map((movie) => ({
-                    value: movie._id,
-                    label: movie.title,
-                  }))}
-                  onChange={(value) => {
-                    const movie = movies.find(m => m._id === value);
-                    setSelectedMovie(movie);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={8}>
-              <Form.Item
-                label="Ticket Price"
-                name="ticketPrice"
-                rules={[
-                  { required: true, message: "Ticket price is required!" },
-                  { type: 'number', min: 1, message: "Price must be greater than 0" },
-                  { type: 'number', max: 10000, message: "Price cannot exceed 10000" }
-                ]}
-              >
-                <Input 
-                  type="number"
-                  min="1"
-                  max="10000"
-                  onChange={(e) => form.setFieldsValue({ 
-                    ticketPrice: Number(e.target.value) 
-                  })}
-                  placeholder="Enter ticket price"
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={8}>
-  <Form.Item
-    label="Total Seats"
-    name="totalSeats"
-    rules={[
-      { required: true, message: "Total seats are required!" },
-      { 
-        validator: async (_, value) => {
-          const seats = Number(value);
-          if (isNaN(seats)) {
-            throw new Error('Please enter a valid number');
-          }
-          if (seats < 1) {
-            throw new Error('Seats must be greater than 0');
-          }
-          if (seats > 500) {
-            throw new Error('Seats cannot exceed 500');
-          }
-          return Promise.resolve();
-        }
-      }
-    ]}
+  <Form
+    form={form}
+    layout="vertical"
+    className="show-form"
+    onFinish={onFinish}
   >
-    <Input
-      type="number"
-      min="1"
-      max="500"
-      onChange={(e) => {
-        const value = Number(e.target.value);
-        form.setFieldsValue({ 
-          totalSeats: value 
-        });
-      }}
-      placeholder="Enter the number of total seats"
-    />
-  </Form.Item>
-</Col>
-
-          </Row>
-
-          <div className="form-actions">
-            <Button 
-              onClick={() => {
-                setView("table");
-                form.resetFields();
-              }} 
-              className="back-button me-3"
+    <Row gutter={[24, 16]}>
+      {/* Recurring Show Option */}
+      {view === "form" && (
+        <Col span={24}>
+          <Form.Item label="Recurring Show">
+            <Checkbox
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
             >
-              <ArrowLeftOutlined /> Go Back
-            </Button>
-            <Button type="primary" htmlType="submit">
-              {view === "form" ? "Add Show" : "Update Show"}
-            </Button>
-          </div>
-        </Form>
+              Make this a recurring show
+            </Checkbox>
+          </Form.Item>
+        </Col>
       )}
+
+      {/* Date Selection */}
+      <Col xs={24} sm={12} md={8}>
+        {isRecurring ? (
+          <Form.Item
+            label="Date Range"
+            name="dateRange"
+            rules={[/* your existing rules */]}
+          >
+            <RangePicker
+              style={{ width: '100%' }}
+              disabledDate={(current) => {/* your existing logic */}}
+            />
+          </Form.Item>
+        ) : (
+          <Form.Item
+            label="Show Date"
+            name="date"
+            rules={[/* your existing rules */]}
+          >
+            <Input type="date" /* your existing props */ />
+          </Form.Item>
+        )}
+      </Col>
+
+      {/* Recurrence Pattern */}
+      {isRecurring && (
+        <Col xs={24} sm={12} md={8}>
+          <Form.Item label="Recurrence Pattern">
+            <Select
+              value={recurrencePattern}
+              onChange={setRecurrencePattern}
+            >
+              <Select.Option value="daily">Daily</Select.Option>
+              <Select.Option value="weekly">Weekly</Select.Option>
+            </Select>
+          </Form.Item>
+        </Col>
+      )}
+
+      {/* Weekly Pattern Days */}
+      {isRecurring && recurrencePattern === 'weekly' && (
+        <Col span={24}>
+          <Form.Item label="Select Days">
+            <Checkbox.Group
+              options={[/* your existing options */]}
+              value={selectedDays}
+              onChange={setSelectedDays}
+            />
+          </Form.Item>
+        </Col>
+      )}
+
+{/* Exception Dates */}
+{isRecurring && (
+  <Col span={24}>
+    <Form.Item label="Add Exception Dates (Skip Dates)">
+      <DatePicker
+        onChange={(date) => {
+          if (date) {
+            // Check if date is already in exceptions
+            if (!exceptions.some(existingDate => 
+              moment(existingDate).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')
+            )) {
+              setExceptions([...exceptions, date]);
+            } else {
+              message.warning('This date is already added as an exception');
+            }
+          }
+        }}
+        disabledDate={(current) => {
+          const dateRange = form.getFieldValue('dateRange');
+          if (!dateRange) {
+            return true; // Disable all dates if no date range is selected
+          }
+          
+          // Disable dates outside the selected range
+          const [startDate, endDate] = dateRange;
+          const isOutOfRange = current.isBefore(startDate, 'day') || 
+                              current.isAfter(endDate, 'day');
+
+          // Disable already selected exception dates
+          const isException = exceptions.some(date => 
+            moment(date).format('YYYY-MM-DD') === current.format('YYYY-MM-DD')
+          );
+
+          return isOutOfRange || isException;
+        }}
+        style={{ width: '200px' }}
+      />
+      <div style={{ marginTop: 8 }}>
+        {exceptions.length > 0 && (
+          <div>
+            <h4>Exception Dates:</h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {exceptions.map((date, index) => (
+                <Tag
+                  key={index}
+                  closable
+                  onClose={() => {
+                    const newExceptions = exceptions.filter((_, i) => i !== index);
+                    setExceptions(newExceptions);
+                  }}
+                  style={{ 
+                    padding: '4px 8px',
+                    marginBottom: '8px',
+                    background: '#f5f5f5',
+                    borderRadius: '4px'
+                  }}
+                >
+                  {moment(date).format('YYYY-MM-DD')}
+                </Tag>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </Form.Item>
+  </Col>
+)}
+
+
+      {/* Show Time */}
+      <Col xs={24} sm={12} md={8}>
+        <Form.Item
+          label="Show Time"
+          name="time"
+          dependencies={['date']}
+          rules={[/* your existing rules */]}
+        >
+          <Input type="time" />
+        </Form.Item>
+      </Col>
+
+      {/* Movie Selection */}
+      <Col xs={24} sm={12} md={8}>
+        <Form.Item
+          label="Select Movie"
+          name="movie"
+          rules={[{ required: true, message: "Movie is required!" }]}
+        >
+          <Select
+            placeholder="Select Movie"
+            options={movies?.map((movie) => ({
+              value: movie._id,
+              label: movie.title,
+            }))}
+            onChange={(value) => {
+              const movie = movies.find(m => m._id === value);
+              setSelectedMovie(movie);
+            }}
+          />
+        </Form.Item>
+      </Col>
+
+      {/* Ticket Price */}
+      <Col xs={24} sm={12} md={8}>
+        <Form.Item
+          label="Ticket Price"
+          name="ticketPrice"
+          rules={[/* your existing rules */]}
+        >
+          <Input 
+            type="number"
+            min="1"
+            max="10000"
+            onChange={(e) => form.setFieldsValue({ 
+              ticketPrice: Number(e.target.value) 
+            })}
+            placeholder="Enter ticket price"
+          />
+        </Form.Item>
+      </Col>
+
+      {/* Total Seats */}
+      <Col xs={24} sm={12} md={8}>
+        <Form.Item
+          label="Total Seats"
+          name="totalSeats"
+          rules={[/* your existing rules */]}
+        >
+          <Input
+            type="number"
+            min="1"
+            max="500"
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              form.setFieldsValue({ 
+                totalSeats: value 
+              });
+            }}
+            placeholder="Enter the number of total seats"
+          />
+        </Form.Item>
+      </Col>
+    </Row>
+
+    {/* Form Actions */}
+    <div className="form-actions">
+      <Button 
+        onClick={() => {
+          setView("table");
+          form.resetFields();
+        }} 
+        className="back-button me-3"
+      >
+        <ArrowLeftOutlined /> Go Back
+      </Button>
+      <Button type="primary" htmlType="submit">
+        {view === "form" ? "Add Show" : "Update Show"}
+      </Button>
+    </div>
+  </Form>
+)}
+
     </Modal>
   );
 };

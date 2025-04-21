@@ -3,18 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { getShowById } from "../../api/shows";
 import { useNavigate, useParams } from "react-router-dom";
-import { message, Card, Row, Col, Button } from "antd";
+import { message, Card, Row, Col, Button, Typography, Divider, notification } from "antd";
+import { ClockCircleOutlined, EnvironmentOutlined, TagOutlined, TeamOutlined } from '@ant-design/icons';
 import moment from "moment";
 import { loadStripe } from "@stripe/stripe-js";
-import { 
-    Elements,
-    useStripe,
-    useElements,
-    CardElement 
-} from "@stripe/react-stripe-js";
+import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { makePayment, bookShow } from "../../api/booking";
 
-const stripePromise = loadStripe("pk_test_51RDa9gPDaxXsuc2w3CPDE2qPzUP2sxCNwf9fMRRS2JWyzuQm9YUZ72uZ8C4FQZ0foGP4zno1NjTJUKPMmj4Y6IlN00UjgdVKv9");
+const { Title, Text } = Typography;
+
+// Initialize Stripe with the public key
+const STRIPE_KEY = "pk_test_51RDa9gPDaxXsuc2w3CPDE2qPzUP2sxCNwf9fMRRS2JWyzuQm9YUZ72uZ8C4FQZ0foGP4zno1NjTJUKPMmj4Y6IlN00UjgdVKv9"
+console.log("Stripe Key:", STRIPE_KEY); // For debugging
+
+const stripePromise = loadStripe(STRIPE_KEY);
 
 const PaymentForm = ({ amount, onSuccess, processing }) => {
     const stripe = useStripe();
@@ -23,10 +25,7 @@ const PaymentForm = ({ amount, onSuccess, processing }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        if (!stripe || !elements) {
-            return;
-        }
+        if (!stripe || !elements) return;
 
         try {
             const { error, paymentMethod } = await stripe.createPaymentMethod({
@@ -46,7 +45,7 @@ const PaymentForm = ({ amount, onSuccess, processing }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="payment-form">
             <div className="card-element-container">
                 <CardElement
                     options={{
@@ -80,7 +79,7 @@ const PaymentForm = ({ amount, onSuccess, processing }) => {
     );
 };
 
-const BookShow = () => {
+function BookShow() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const params = useParams();
@@ -90,8 +89,6 @@ const BookShow = () => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [clientSecret, setClientSecret] = useState("");
     const [processing, setProcessing] = useState(false);
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [booking, setBooking] = useState(null);
 
     const getData = async () => {
         try {
@@ -102,43 +99,9 @@ const BookShow = () => {
             } else {
                 message.error(response.message);
             }
-            dispatch(HideLoading());
         } catch (error) {
             message.error(error.message);
-            dispatch(HideLoading());
-        }
-    };
-
-    const onToken = async (token) => {
-        try {
-            dispatch(ShowLoading());
-            const amount = selectedSeats.length * show.ticketPrice;
-            setTotalAmount(amount);
-            
-            const response = await makePayment({
-                token,
-                amount: amount * 100,
-                seats: selectedSeats,
-                showId: params.id,
-                userId: user._id
-            });
-
-            if (response.success) {
-                setBooking(response.data);
-                message.success(response.message);
-                navigate('/ticket-view', {
-                    state: {
-                        booking: response.data,
-                        show: show,
-                        movie: show.movie
-                    }
-                });
-            } else {
-                message.error(response.message);
-            }
-            dispatch(HideLoading());
-        } catch (error) {
-            message.error(error.message);
+        } finally {
             dispatch(HideLoading());
         }
     };
@@ -148,8 +111,8 @@ const BookShow = () => {
             setProcessing(true);
             dispatch(ShowLoading());
     
+            const amount = selectedSeats.length * show.ticketPrice;
             const stripe = await stripePromise;
-            const amount = selectedSeats.length * show.ticketPrice; // Calculate amount
     
             const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: paymentMethod.id,
@@ -165,20 +128,21 @@ const BookShow = () => {
                     seats: selectedSeats,
                     transactionId: paymentIntent.id,
                     user: user._id,
-                    totalAmount: amount, // Add the total amount here
+                    totalAmount: amount,
                 });
     
                 if (bookingResponse.success) {
-                    const bookingWithAmount = {
-                        ...bookingResponse.data,
-                        totalAmount: amount // Ensure amount is included in booking data
-                    };
-                    
-                    setBooking(bookingWithAmount);
-                    message.success("Show booked successfully");
+                    notification.success({
+                        message: 'Booking Confirmed! 🎉',
+                        description: 'E-ticket has been sent to your registered email (Check spam folder if not found)',
+                        duration: 5
+                    });
                     navigate("/ticket-view", {
                         state: {
-                            booking: bookingWithAmount, // Pass the booking with amount
+                            booking: {
+                                ...bookingResponse.data,
+                                totalAmount: amount
+                            },
                             show: show,
                             movie: show.movie
                         }
@@ -194,80 +158,6 @@ const BookShow = () => {
             dispatch(HideLoading());
         }
     };
-    
-
-    const getSeats = () => {
-        let columns = 12;
-        let totalSeats = show.totalSeats;
-        let rows = Math.ceil(totalSeats / columns);
-
-        return (
-            <div className="d-flex flex-column align-items-center">
-                <div className="w-100 max-width-600 mx-auto mb-25px">
-                    <p className="text-center mb-10px">
-                        Screen this side, you will be watching in this direction
-                    </p>
-                    <div className="screen-div"></div>
-                </div>
-
-                <ul className="seat-ul justify-content-center" style={{ marginLeft: "25%" }}>
-                    {Array.from(Array(rows).keys()).map((row) =>
-                        Array.from(Array(columns).keys()).map((column) => {
-                            let seatNumber = row * columns + column + 1;
-                            let seatClass = "seat-btn";
-
-                            if (selectedSeats.includes(seatNumber)) {
-                                seatClass += " selected";
-                            }
-
-                            if (show.bookedSeats.includes(seatNumber)) {
-                                seatClass += " booked";
-                            }
-
-                            if (seatNumber <= totalSeats) {
-                                return (
-                                    <li key={seatNumber}>
-                                        <button
-                                            className={seatClass}
-                                            onClick={() => {
-                                                if (selectedSeats.includes(seatNumber)) {
-                                                    setSelectedSeats(
-                                                        selectedSeats.filter(
-                                                            (curSeatNumber) => curSeatNumber !== seatNumber
-                                                        )
-                                                    );
-                                                } else {
-                                                    setSelectedSeats([...selectedSeats, seatNumber]);
-                                                }
-                                            }}
-                                        >
-                                            {seatNumber}
-                                        </button>
-                                    </li>
-                                );
-                            }
-                            return null;
-                        })
-                    )}
-                </ul>
-
-                <div className="d-flex bottom-card justify-content-between w-100 max-width-600 mx-auto mb-25px mt-3">
-                    <div className="flex-1">
-                        Selected Seats: <span>{selectedSeats.join(", ")}</span>
-                    </div>
-                    <div className="flex-shrink-0 ms-3">
-                        Total Price: <span>£ {selectedSeats.length * show.ticketPrice}</span>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    useEffect(() => {
-        if (selectedSeats.length > 0) {
-            initializePayment();
-        }
-    }, [selectedSeats]);
 
     const initializePayment = async () => {
         try {
@@ -292,58 +182,129 @@ const BookShow = () => {
         getData();
     }, []);
 
-    return (
-        <>
-            {show && (
-                <Row gutter={24}>
-                    <Col span={24}>
-                        <Card
-                            title={
-                                <div className="movie-title-details">
-                                    <h1>{show.movie.title}</h1>
-                                    <p>
-                                        Theatre: {show.theatre.name}, {show.theatre.address}
-                                    </p>
-                                </div>
-                            }
-                            extra={
-                                <div className="show-name py-3">
-                                    <h3>
-                                        <span>Date & Time: </span>
-                                        {moment(show.date).format("MMM Do YYYY")} at{" "}
-                                        {moment(show.time, "HH:mm").format("hh:mm A")}
-                                    </h3>
-                                    <h3>
-                                        <span>Ticket Price:</span> GBP. {show.ticketPrice}/-
-                                    </h3>
-                                    <h3>
-                                        <span>Total Seats:</span> {show.totalSeats}
-                                        <span> &nbsp;|&nbsp; Available Seats:</span>{" "}
-                                        {show.totalSeats - show.bookedSeats.length}
-                                    </h3>
-                                </div>
-                            }
-                            style={{ width: "100%" }}
-                        >
-                            {getSeats()}
+    useEffect(() => {
+        if (selectedSeats.length > 0) {
+            initializePayment();
+        }
+    }, [selectedSeats]);
 
-                            {selectedSeats.length > 0 && clientSecret && (
-                                <div className="payment-container">
-                                    <Elements stripe={stripePromise} options={{ clientSecret }}>
-                                        <PaymentForm
-                                            amount={selectedSeats.length * show.ticketPrice}
-                                            onSuccess={handlePayment}
-                                            processing={processing}
-                                        />
-                                    </Elements>
+    if (!show) return null;
+
+    return (
+        <div className="booking-container">
+            <Row gutter={[16, 16]}>
+                <Col span={24}>
+                    <Card className="movie-info-card">
+                        <div className="movie-header">
+                            <div className="movie-details">
+                                <Title level={2}>{show.movie.title}</Title>
+                                <Text type="secondary">
+                                    <EnvironmentOutlined /> {show.theatre.name}
+                                </Text>
+                                <div className="show-info">
+                                    <Text>
+                                        <ClockCircleOutlined /> {moment(show.date).format("MMM Do YYYY")} at {" "}
+                                        {moment(show.time, "HH:mm").format("hh:mm A")}
+                                    </Text>
+                                    <Text>
+                                        <TagOutlined /> £{show.ticketPrice} per ticket
+                                    </Text>
                                 </div>
-                            )}
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+
+                <Col span={24}>
+                    <Card className="seats-card">
+                        <Title level={4} className="text-center">Select Your Seats</Title>
+                        
+                        <div className="screen-container">
+                            <div className="screen"></div>
+                            <Text type="secondary">Screen</Text>
+                        </div>
+
+                        <div className="seats-legend">
+                            <div className="legend-item">
+                                <div className="seat available"></div>
+                                <span>Available</span>
+                            </div>
+                            <div className="legend-item">
+                                <div className="seat selected"></div>
+                                <span>Selected</span>
+                            </div>
+                            <div className="legend-item">
+                                <div className="seat booked"></div>
+                                <span>Booked</span>
+                            </div>
+                        </div>
+
+                        <div className="seats-container">
+                            {Array.from({ length: Math.ceil(show.totalSeats / 12) }).map((_, row) => (
+                                <div key={row} className="seat-row">
+                                    {Array.from({ length: 12 }).map((_, col) => {
+                                        const seatNumber = row * 12 + col + 1;
+                                        if (seatNumber > show.totalSeats) return null;
+
+                                        const isSelected = selectedSeats.includes(seatNumber);
+                                        const isBooked = show.bookedSeats.includes(seatNumber);
+
+                                        return (
+                                            <button
+                                                key={seatNumber}
+                                                className={`seat ${isSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}
+                                                onClick={() => {
+                                                    if (!isBooked) {
+                                                        if (isSelected) {
+                                                            setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                                                        } else {
+                                                            setSelectedSeats([...selectedSeats, seatNumber]);
+                                                        }
+                                                    }
+                                                }}
+                                                disabled={isBooked}
+                                            >
+                                                {seatNumber}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+
+                        {selectedSeats.length > 0 && (
+                            <div className="booking-summary">
+                                <div className="summary-item">
+                                    <Text>Selected Seats:</Text>
+                                    <Text strong>{selectedSeats.sort((a, b) => a - b).join(", ")}</Text>
+                                </div>
+                                <div className="summary-item">
+                                    <Text>Total Amount:</Text>
+                                    <Text strong>£{selectedSeats.length * show.ticketPrice}</Text>
+                                </div>
+                            </div>
+                        )}
+                    </Card>
+                </Col>
+
+                {selectedSeats.length > 0 && clientSecret && (
+                    <Col span={24}>
+                        <Card className="payment-card">
+                            <Title level={4}>Payment Details</Title>
+                            <Divider />
+                            <Elements stripe={stripePromise} options={{ clientSecret }}>
+                                <PaymentForm
+                                    amount={selectedSeats.length * show.ticketPrice}
+                                    onSuccess={handlePayment}
+                                    processing={processing}
+                                />
+                            </Elements>
                         </Card>
                     </Col>
-                </Row>
-            )}
-        </>
+                )}
+            </Row>
+        </div>
     );
-};
+}
 
 export default BookShow;

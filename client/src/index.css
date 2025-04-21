@@ -287,9 +287,6 @@ body {
 
 /* Card and Movie Styles */
 .movie-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   transition: transform 0.3s ease;
 }
 
@@ -328,7 +325,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
 
@@ -583,8 +580,18 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 2rem;
+  margin: 16px 0;
 }
+
+.movie-tags .ant-tag {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 14px;
+}
+
 
 .date-picker-section {
   margin-top: 2rem;
@@ -679,19 +686,16 @@ body {
 
 
 .movie-title {
-  font-size: 17px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 12px 0;
-  color: #1a1a1a;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  min-height: 44px;
-  transition: color 0.3s ease; /* Add smooth transition */
-  cursor: pointer; /* Add pointer cursor to indicate clickable */
+  cursor: pointer;
 }
 
 .movie-title:hover {
@@ -707,9 +711,19 @@ body {
 
 .movie-genre,
 .movie-language {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.age-rating-badge {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.age-rating-badge:hover {
+  transform: scale(1.05);
 }
 
 
@@ -717,8 +731,7 @@ body {
 .movie-info {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 90px; /* Set minimum height for content */
+  gap: 8px;/* Set minimum height for content */
 }
 
 .movie-title-container {
@@ -761,6 +774,11 @@ body {
   .movie-tag {
     font-size: 11px;
   }
+
+  .age-rating-badge {
+    font-size: 11px !important;
+    padding: 1px 4px !important;
+  }
 }
 
 /* For single movie page */
@@ -784,11 +802,10 @@ body {
 
 
 .movie-description {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 16px 0;
+  font-size: 16px;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
-  max-width: 800px;
 }
 
 
@@ -1249,5 +1266,230 @@ body {
   }
 }
 
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-element-container {
+  padding: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.payment-error {
+  color: #ff4d4f;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .MovieHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .ShowDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+.booking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.movie-info-card {
+  margin-bottom: 24px;
+}
+
+.movie-header {
+  display: flex;
+  gap: 24px;
+}
 
 
+
+.movie-details {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.show-info {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.screen-container {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.screen {
+  height: 10px;
+  background: linear-gradient(to bottom, #666, transparent);
+  margin: 0 auto 8px;
+  width: 80%;
+  border-top-left-radius: 100%;
+  border-top-right-radius: 100%;
+}
+
+.seats-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.seat-row {
+  display: flex;
+  gap: 8px;
+}
+
+.seat {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.seat:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.seat.selected {
+  background: #52c41a;
+  border-color: #52c41a;
+  color: white;
+}
+
+.seat.booked {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.seat.booked:hover {
+  transform: none;
+}
+
+.booking-summary {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-card {
+  margin-top: 24px;
+}
+
+.card-element-container {
+  padding: 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.payment-error {
+  color: #ff4d4f;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .movie-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+  }
+
+  .show-info {
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+  }
+
+  .seat {
+      width: 30px;
+      height: 30px;
+      font-size: 11px;
+  }
+
+  .seat-row {
+      gap: 4px;
+  }
+
+  .seats-legend {
+      flex-wrap: wrap;
+  }
+}
+
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f5f5f5;
+}
+
+.ant-badge {
+  transition: all 0.3s ease;
+}
+
+.ant-badge:hover {
+  transform: scale(1.05);
+}
+
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}

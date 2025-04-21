@@ -39,7 +39,7 @@ function Forget() {
         <main className="main-area mw-500 text-center px-3">
           
           <section className="left-section">
-            <h1>Forget Password</h1>
+            <h1>Forgot Password</h1>
           </section>
           
           <section className="right-section">

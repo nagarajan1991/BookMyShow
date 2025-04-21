@@ -8,7 +8,7 @@ import Profile from "./pages/Profile";
 import Partner from "./pages/Partner";
 import SingleMovie from "./pages/Home/SingleMovie";
 import BookShow from './pages/Home/BookShow';
-import Forget from "./pages/Profile/ForgetPassword";
+import Forgot from "./pages/Profile/ForgotPassword";
 import Reset from "./pages/Profile/ResetPassword";
 import TicketView from './pages/Home/TicketView';
 
@@ -56,7 +56,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/forget" element={<Forget />} />
+            <Route path="/forgot-password" element={<Forgot />} />
             <Route path="/reset/:email" element={<Reset />} />
 
             {/* Protected Routes with Role-Based Access */}

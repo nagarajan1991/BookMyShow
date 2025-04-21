@@ -1,10 +1,19 @@
 // MovieForm.jsx
-import { Col, Modal, Row, Form, Input, Select, Button, message } from "antd";
+import { Col, Modal, Row, Form, Input, Select, Button, message,Tooltip } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { ShowLoading, HideLoading } from "../../redux/loaderSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import { addMovie, updateMovie } from "../../api/movie";
 import moment from "moment";
+
+
+const AGE_RATINGS = [
+  { value: 'U', label: 'U - Universal, suitable for all ages', color: '#4CAF50' },
+  { value: 'PG', label: 'PG - Parental Guidance', color: '#8BC34A' },
+  { value: '12A', label: '12A - Suitable for 12 years and over', color: '#FFC107' },
+  { value: '15', label: '15 - Suitable only for 15 years and over', color: '#FF9800' },
+  { value: '18', label: '18 - Suitable only for adults', color: '#F44336' },
+];
 
 const MovieForm = ({
   isModalOpen,
@@ -15,7 +24,7 @@ const MovieForm = ({
   getData,
 }) => {
   const dispatch = useDispatch();
-
+  const { user } = useSelector((state) => state.users);
   if (selectedMovie) {
     selectedMovie.releaseDate = moment(selectedMovie.releaseDate).format(
       "YYYY-MM-DD"
@@ -26,11 +35,26 @@ const MovieForm = ({
     try {
       dispatch(ShowLoading());
       let response;
+      
+      const movieData = {
+        title: values.title.trim(),
+        userId: user._id, // Make sure this exists
+        description: values.description,
+        duration: values.duration,
+        language: values.language,
+        genre: values.genre,
+        releaseDate: moment(values.releaseDate).format('YYYY-MM-DD'),
+        poster: values.poster,
+        ageRating: values.ageRating, // Add this line
+      };
+  
+      // Debug log to check the data
+      console.log('Movie Data being sent:', movieData);
 
       if (formType === "add") {
-        response = await addMovie(values);
+        response = await addMovie(movieData);
       } else {
-        response = await updateMovie({ ...values, movieId: selectedMovie._id });
+        response = await updateMovie({ ...movieData, movieId: selectedMovie._id });
       }
 
       if (response && response.success) {  // Added check for response existence
@@ -149,9 +173,49 @@ const MovieForm = ({
                       { value: "Comedy", label: "Comedy" },
                       { value: "Drama", label: "Drama" },
                       { value: "Romance", label: "Romance" },
+                      { value: "Horror", label: "Horror" },
+                      { value: "Kids", label: "Kids" },
+                      { value: "Family", label: "Family" },
                       // ... other genres
                     ]}
                   />
+                </Form.Item>
+              </Col>
+
+              <Col span={8}>
+                <Form.Item
+                  label="Age Rating"
+                  name="ageRating"
+                  rules={[{ required: true, message: "Age rating is required!" }]}
+                >
+                  <Select
+                    placeholder="Select age rating"
+                    optionLabelProp="label"
+                  >
+                    {AGE_RATINGS.map(rating => (
+                      <Select.Option 
+                        key={rating.value} 
+                        value={rating.value}
+                        label={rating.value}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div
+                            style={{
+                              backgroundColor: rating.color,
+                              color: 'white',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              marginRight: '8px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            {rating.value}
+                          </div>
+                          <span>{rating.label}</span>
+                        </div>
+                      </Select.Option>
+                    ))}
+                  </Select>
                 </Form.Item>
               </Col>
 

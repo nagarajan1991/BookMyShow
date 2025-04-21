@@ -1,11 +1,10 @@
-// TicketView.jsx
+// TicketView.js
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Button } from 'antd';
+import { Card, Button } from 'antd';
 import { QRCodeSVG } from 'qrcode.react';
 import moment from 'moment';
 import { useSelector } from 'react-redux';
-import { DownloadOutlined } from '@ant-design/icons';
 
 const TicketView = () => {
   const location = useLocation();
@@ -27,164 +26,214 @@ const TicketView = () => {
   };
 
   const styles = {
-    container: {
+    pageContainer: {
       maxWidth: '1000px',
       margin: '2rem auto',
-      padding: '0 1rem',
+      padding: '20px',
     },
     card: {
       background: 'white',
       borderRadius: '12px',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      overflow: 'hidden',
     },
-    posterSection: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '1.5rem',
+    contentGrid: {
+      display: 'grid',
+      gridTemplateColumns: '300px 1fr',
+      gap: '24px',
+      padding: '24px',
     },
     posterContainer: {
-      aspectRatio: '2/3',
       width: '100%',
-      maxWidth: '300px',
+      aspectRatio: '2/3',
       borderRadius: '8px',
       overflow: 'hidden',
+      marginBottom: '20px',
     },
     poster: {
       width: '100%',
       height: '100%',
       objectFit: 'cover',
-      display: 'block',
     },
-    downloadButton: {
-      minWidth: '160px',
-      height: '40px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '0.5rem',
-    },
-    ticketDetails: {
-      padding: '0 1rem',
-    },
-    movieTitle: {
-      fontSize: '1.8rem',
-      fontWeight: 600,
-      marginBottom: '1.5rem',
-      color: '#1a1a1a',
-    },
-    detailsGrid: {
-      display: 'grid',
-      gap: '1.5rem',
-      marginBottom: '2rem',
-    },
-    detailItem: {
+    detailsSection: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '0.25rem',
+      gap: '20px',
+    },
+    movieTitle: {
+      fontSize: '24px',
+      fontWeight: 'bold',
+      color: '#1a1a1a',
+      marginBottom: '16px',
+    },
+    infoGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '16px',
+    },
+    infoItem: {
+      marginBottom: '12px',
     },
     label: {
       color: '#666',
-      fontSize: '0.9rem',
+      fontSize: '14px',
+      marginBottom: '4px',
     },
     value: {
       color: '#1a1a1a',
-      fontSize: '1rem',
+      fontSize: '16px',
+      fontWeight: '500',
     },
     qrSection: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '1.5rem',
-      background: '#f8f8f8',
-      borderRadius: '8px',
-      marginTop: '1rem',
+      marginTop: '20px',
     },
-    qrText: {
-      marginTop: '0.5rem',
-      color: '#666',
+    downloadButton: {
+      marginTop: '20px',
+      width: '100%',
     },
+    // Print-specific styles
+    printStyles: `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .print-ticket, .print-ticket * {
+          visibility: visible;
+        }
+        .print-ticket {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 20px;
+        }
+        .no-print {
+          display: none !important;
+        }
+        @page {
+          size: A4;
+          margin: 0;
+        }
+      }
+    `
   };
 
-  // Media query styles for mobile devices
-  if (window.innerWidth <= 768) {
-    styles.container.margin = '1rem auto';
-    styles.posterContainer.maxWidth = '200px';
-    styles.movieTitle.fontSize = '1.5rem';
-    styles.movieTitle.textAlign = 'center';
-    styles.ticketDetails.padding = '0';
-    styles.ticketDetails.marginTop = '1rem';
-  }
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
-    <div style={styles.container}>
-      <Card style={styles.card}>
-        <Row gutter={[24, 24]}>
-          {/* Movie Poster Section */}
-          <Col xs={24} md={8}>
-            <div style={styles.posterSection}>
+    <>
+      <style>{styles.printStyles}</style>
+      <div style={styles.pageContainer}>
+        <Card style={styles.card} className="print-ticket">
+          {/* Header with Logo */}
+          <div style={{ 
+            borderBottom: '2px solid #f0f0f0', 
+            padding: '16px 24px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <h1 style={{ 
+              margin: 0, 
+              color: '#f84464', 
+              fontSize: '24px', 
+              fontWeight: 'bold' 
+            }}>
+              BOOKMYSHOW
+            </h1>
+            <div style={{ textAlign: 'right', fontSize: '14px', color: '#666' }}>
+              <div>Booking ID: {booking._id}</div>
+              <div>Booked On: {moment(booking.createdAt).format("DD-MM-YYYY hh:mm A")}</div>
+            </div>
+          </div>
+
+          <div style={styles.contentGrid}>
+            {/* Left Section - Poster */}
+            <div>
               <div style={styles.posterContainer}>
-                <img 
-                  src={movie.poster} 
-                  alt={movie.title} 
-                  style={styles.poster}
-                />
+                <img src={movie.poster} alt={movie.title} style={styles.poster} />
               </div>
               <Button 
                 type="primary" 
-                icon={<DownloadOutlined />}
-                onClick={() => window.print()}
+                onClick={handlePrint} 
                 style={styles.downloadButton}
+                className="no-print"
               >
                 Download Ticket
               </Button>
             </div>
-          </Col>
 
-          {/* Ticket Details Section */}
-          <Col xs={24} md={16}>
-            <div style={styles.ticketDetails}>
-              <h1 style={styles.movieTitle}>{movie.title}</h1>
+            {/* Right Section - Details */}
+            <div style={styles.detailsSection}>
+              <h2 style={styles.movieTitle}>{movie.title}</h2>
               
-              <div style={styles.detailsGrid}>
-                <div style={styles.detailItem}>
-                  <label style={styles.label}>Date & Time</label>
-                  <span style={styles.value}>
-                    {moment(show.date).format('MMM Do YYYY')} at {moment(show.time, 'HH:mm').format('hh:mm A')}
-                  </span>
+              <div style={styles.infoGrid}>
+                <div style={styles.infoItem}>
+                  <div style={styles.label}>Date</div>
+                  <div style={styles.value}>
+                    {moment(show.date).format('MMM Do YYYY')}
+                  </div>
                 </div>
 
-                <div style={styles.detailItem}>
-                  <label style={styles.label}>Seats</label>
-                  <span style={styles.value}>{booking.seats.join(', ')}</span>
+                <div style={styles.infoItem}>
+                  <div style={styles.label}>Time</div>
+                  <div style={styles.value}>
+                    {moment(show.time, 'HH:mm').format('hh:mm A')}
+                  </div>
                 </div>
 
-                <div style={styles.detailItem}>
-                  <label style={styles.label}>Booking ID</label>
-                  <span style={styles.value}>{booking._id}</span>
+                <div style={styles.infoItem}>
+                  <div style={styles.label}>Theatre</div>
+                  <div style={styles.value}>{show.theatre.name}</div>
                 </div>
 
-                <div style={styles.detailItem}>
-                  <label style={styles.label}>Amount Paid</label>
-                  <span style={styles.value}>£{booking.totalAmount}</span>
+                <div style={styles.infoItem}>
+                  <div style={styles.label}>Amount Paid</div>
+                  <div style={styles.value}>£{booking.totalAmount}</div>
                 </div>
               </div>
 
-              {/* QR Code Section */}
+              <div style={styles.infoItem}>
+                <div style={styles.label}>Seats</div>
+                <div style={styles.value}>{booking.seats.join(', ')}</div>
+              </div>
+
               <div style={styles.qrSection}>
                 <QRCodeSVG
                   value={generateQRData()}
-                  size={128}
+                  size={120}
                   level="H"
                   includeMargin={true}
                 />
-                <p style={styles.qrText}>Scan for entry</p>
+                <p style={{ marginTop: '8px', color: '#666' }}>Scan for entry</p>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div style={{ 
+                marginTop: '20px', 
+                padding: '16px', 
+                backgroundColor: '#f8f8f8', 
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#666'
+              }}>
+                <h4 style={{ marginBottom: '8px' }}>Terms & Conditions:</h4>
+                <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                  <li>Please arrive 15 minutes before show time</li>
+                  <li>Outside food and beverages are not allowed</li>
+                  <li>This ticket is non-refundable and non-transferable</li>
+                </ul>
               </div>
             </div>
-          </Col>
-        </Row>
-      </Card>
-    </div>
+          </div>
+        </Card>
+      </div>
+    </>
   );
 };
 

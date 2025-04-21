@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getMovieById } from "../../api/movie";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
-import { message, Input, Row, Col, Card, Tag, Divider, Skeleton} from "antd";
+import { message, Input, Row, Col, Card, Tag, Divider, Skeleton, Badge, Tooltip } from "antd";
 import moment from "moment";
 import { getAllTheatresByMovie } from "../../api/shows";
 import { 
@@ -13,6 +13,15 @@ import {
   TagOutlined,
   EnvironmentOutlined 
 } from "@ant-design/icons";
+
+
+const AGE_RATINGS = {
+  'U': { color: '#4CAF50', label: 'Universal, suitable for all ages' },
+  'PG': { color: '#8BC34A', label: 'Parental Guidance' },
+  '12A': { color: '#FFC107', label: 'Suitable for 12 years and over' },
+  '15': { color: '#FF9800', label: 'Suitable only for 15 years and over' },
+  '18': { color: '#F44336', label: 'Adults Only' }
+};
 
 const SingleMovie = () => {
   const params = useParams();
@@ -120,39 +129,53 @@ const SingleMovie = () => {
                       </div>
                     </Col>
                     <Col xs={24} sm={16} md={18}>
-                      <div className="movie-info">
-                        <h1 className="movie-title" style={{ color: 'white' }}>{movie.title}</h1>
-                        <p className="movie-description">
-                            {movie.description}
-                        </p>
-  
-                        <div className="movie-tags">
-                          <Tag icon={<GlobalOutlined />} color="blue">
-                            {movie.language}
-                          </Tag>
-                          <Tag icon={<TagOutlined />} color="purple">
-                            {movie.genre}
-                          </Tag>
-                          <Tag icon={<CalendarOutlined />} color="green">
-                            {moment(movie.releaseDate).format("MMM Do YYYY")}
-                          </Tag>
-                          <Tag icon={<ClockCircleOutlined />} color="orange">
-                            {movie.duration} Minutes
-                          </Tag>
-                        </div>
-  
-                        <div className="date-picker-section">
-                          <label className="date-label">Select Show Date:</label>
-                          <Input
-                            onChange={handleDate}
-                            type="date"
-                            min={moment().format("YYYY-MM-DD")}
-                            value={date}
-                            className="date-input"
-                            prefix={<CalendarOutlined />}
-                          />
-                        </div>
-                      </div>
+                    <div className="movie-info">
+    <h1 className="movie-title" style={{ color: 'white' }}>{movie.title}</h1>
+    <p className="movie-description">
+        {movie.description}
+    </p>
+
+    <div className="movie-tags">
+        {/* Add the age rating badge first */}
+        <Tooltip title={AGE_RATINGS[movie.ageRating]?.label}>
+            <Tag 
+                style={{
+                    backgroundColor: AGE_RATINGS[movie.ageRating]?.color || '#999',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 12px',
+                    fontWeight: 'bold'
+                }}
+            >
+                {movie.ageRating || 'N/A'}
+            </Tag>
+        </Tooltip>
+        <Tag icon={<GlobalOutlined />} color="blue">
+            {movie.language}
+        </Tag>
+        <Tag icon={<TagOutlined />} color="purple">
+            {movie.genre}
+        </Tag>
+        <Tag icon={<CalendarOutlined />} color="green">
+            {moment(movie.releaseDate).format("MMM Do YYYY")}
+        </Tag>
+        <Tag icon={<ClockCircleOutlined />} color="orange">
+            {movie.duration} Minutes
+        </Tag>
+    </div>
+
+    <div className="date-picker-section">
+        <label className="date-label">Select Show Date:</label>
+        <Input
+            onChange={handleDate}
+            type="date"
+            min={moment().format("YYYY-MM-DD")}
+            value={date}
+            className="date-input"
+            prefix={<CalendarOutlined />}
+        />
+    </div>
+</div>
                     </Col>
                   </Row>
                 </Card>
@@ -162,7 +185,7 @@ const SingleMovie = () => {
   
           <div className="container mx-auto px-4">
             <div className="theatres-section">
-              <h2 className="section-title">Available Theatres</h2>
+              <h2 className="section-title">Showtimes & Locations</h2>
               <Divider />
               
               {theatres.map((theatre) => (
