@@ -120,10 +120,59 @@ const register = async (req, res) => {
 
 }
 
+
+const updateProfile = async (req, res) => {
+  try {
+      const { userId, ...updates } = req.body;
+
+      // Ensure the user can only update their own profile
+      if (req.user.id !== userId) {
+          return res.status(403).send({
+              success: false,
+              message: "You can only update your own profile"
+          });
+      }
+
+      // Remove sensitive fields that shouldn't be updated
+      delete updates.password;
+      delete updates.email; // Optionally remove email if you don't want it to be updated
+      delete updates.isAdmin;
+      delete updates.role;
+
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          {
+              $set: updates
+          },
+          { new: true, runValidators: true }
+      ).select('-password'); // Exclude password from the response
+
+      if (!updatedUser) {
+          return res.status(404).send({
+              success: false,
+              message: "User not found"
+          });
+      }
+
+      res.status(200).send({
+          success: true,
+          message: "Profile updated successfully",
+          data: updatedUser
+      });
+  } catch (error) {
+      res.status(500).send({
+          success: false,
+          message: error.message
+      });
+  }
+};
+
+
 module.exports = {
     register,
     login,
     getCurrentUser,
+    updateProfile,
 };
 
 

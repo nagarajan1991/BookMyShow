@@ -15,6 +15,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    phoneNumber: {
+        type: String,
+        required: false
+    },
+    address: {
+        type: String,
+        required: false
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other'],
+        required: false
+    },
     role: {
         type: String,
         enum: ['user', 'admin', 'partner'],
@@ -23,6 +36,10 @@ const userSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
     otp: String,
     otpExpiry: Date

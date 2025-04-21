@@ -36,6 +36,12 @@ const movieSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users',
     required: true
+  },
+  ageRating: {
+    type: String,
+    required: true,
+    enum: ['U', 'PG', '12A', '15', '18'],
+    default: 'PG'
   }
 }, { timestamps: true });
 

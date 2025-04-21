@@ -5,7 +5,8 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const {
   register,
   login,
-  getCurrentUser
+  getCurrentUser,
+  updateProfile
 } = require("../controllers/userController");
 
 const User = require("../model/userModel");
@@ -15,6 +16,9 @@ const EmailHelper = require("../utils/emailHelper");
 router.post("/login", login);
 // backend/routes/userRoute.js
 router.post("/register", register);
+
+// Add new route for updating profile
+router.post('/update-profile', authMiddleware, updateProfile);
 
 
 // GET

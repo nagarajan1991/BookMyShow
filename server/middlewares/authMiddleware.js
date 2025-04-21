@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
-    console.log("Auth Header:", authHeader);
+    //console.log("Auth Header:", authHeader);
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).send({
@@ -14,7 +14,7 @@ module.exports = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    console.log("Received token:", token);
+    //console.log("Received token:", token);
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is not set");
@@ -26,7 +26,7 @@ module.exports = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded token:", decoded);
+      //console.log("Decoded token:", decoded);
       
       // Add user info to request
       req.userId = decoded.userId;
